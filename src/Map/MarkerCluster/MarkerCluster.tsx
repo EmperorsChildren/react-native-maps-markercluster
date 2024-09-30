@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dimensions, LayoutAnimation, Platform } from 'react-native'
+import { Dimensions, LayoutAnimation, Platform, UIManager } from 'react-native'
 import Supercluster from 'supercluster'
 
 import { useMapView } from '../MapView'
@@ -11,6 +11,14 @@ import {
 } from '../MapView/helpers'
 import { MarkerClusterType } from '../types'
 import { MarkerClusterItem } from './MarkerClusterItem'
+
+// https://reactnative.dev/docs/0.74/layoutanimation
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true)
+}
 
 export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
   React.memo((props) => {
@@ -43,7 +51,7 @@ export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
       const zoom = returnMapZoom(region, bBox, props.minZoom!)
       const newClusters = superClusterRef.current.getClusters(bBox, zoom)
 
-      if (props.animationEnabled && Platform.OS === 'ios') {
+      if (props.animationEnabled) {
         LayoutAnimation.configureNext(props.layoutAnimationConf!)
       }
 
