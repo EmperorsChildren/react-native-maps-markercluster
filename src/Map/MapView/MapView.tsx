@@ -40,7 +40,7 @@ export const MapView: React.FC<Props> = (props) => {
   }, [mapRef, mapRefReceiver])
 
   const [currentRegion, setCurrentRegion] = React.useState(
-    region || initialRegion
+    region || initialRegion,
   )
 
   const handleOnRegionChangeComplete = useCallback(
@@ -48,7 +48,7 @@ export const MapView: React.FC<Props> = (props) => {
       setCurrentRegion(r)
       onRegionChangeComplete?.(r, d)
     },
-    [onRegionChangeComplete]
+    [onRegionChangeComplete],
   )
 
   return (

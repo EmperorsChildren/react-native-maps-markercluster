@@ -1,4 +1,4 @@
-import GeoViewport from '@mapbox/geo-viewport'
+import GeoViewport from '@placemarkio/geo-viewport'
 import type { Component } from 'react'
 import { Dimensions } from 'react-native'
 import type { MapMarkerProps, Region } from 'react-native-maps'
@@ -8,7 +8,7 @@ import type { MarkerClusterType } from '../types'
 const { width, height } = Dimensions.get('window')
 
 export const isMarker = (
-  component: any
+  component: any,
 ): component is Component<MapMarkerProps> =>
   component &&
   component.props &&
@@ -31,7 +31,7 @@ export const calculateBBox = (region: Region): GeoViewport.BoundingBox => {
 export const returnMapZoom = (
   region: Region,
   bBox: GeoViewport.BoundingBox,
-  minZoom: number
+  minZoom: number,
 ) => {
   const viewport =
     region.longitudeDelta >= 40
@@ -43,7 +43,7 @@ export const returnMapZoom = (
 
 export const markerToGeoJSONFeature = (
   marker: Component<MapMarkerProps>,
-  index: number
+  index: number,
 ): MarkerClusterType.GeoJSONFeature => {
   return {
     type: 'Feature',
@@ -66,7 +66,7 @@ export const generateSpiral = (
   cluster: MarkerClusterType.Cluster,
   clusterChildren: MarkerClusterType.ClusterChildren,
   clusters: MarkerClusterType.Cluster[],
-  index: number
+  index: number,
 ) => {
   const { properties, geometry } = cluster
   const count = properties.point_count
@@ -133,7 +133,7 @@ const _removeChildrenFromProps = (props: MapMarkerProps) => {
 
 export const getStyleProperty = (
   pointSize: MarkerClusterType.Size,
-  prop?: MarkerClusterType.StyleProp
+  prop?: MarkerClusterType.StyleProp,
 ) => {
   return typeof prop === 'function' ? prop(pointSize) : prop
 }

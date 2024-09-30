@@ -13,23 +13,23 @@ export const MarkerClusterItem: React.FC<MarkerClusterType.ClusterProps> =
     // NOTE: STYLES
     const pointSize = React.useMemo<MarkerClusterType.Size>(
       () => (points < 10 ? 'small' : points < 100 ? 'medium' : 'large'),
-      [points]
+      [points],
     )
     const clusterBackgroundColor = React.useMemo(
       () => getStyleProperty(pointSize, props.clusterBackgroundColor),
-      [props.clusterBackgroundColor, pointSize]
+      [props.clusterBackgroundColor, pointSize],
     )
     const clusterWrapperBackgroundColor = React.useMemo(
       () => getStyleProperty(pointSize, props.clusterWrapperBackgroundColor),
-      [props.clusterWrapperBackgroundColor, pointSize]
+      [props.clusterWrapperBackgroundColor, pointSize],
     )
     const clusterTextColor = React.useMemo(
       () => getStyleProperty(pointSize, props.clusterTextColor),
-      [props.clusterTextColor, pointSize]
+      [props.clusterTextColor, pointSize],
     )
     const clusterFontFamily = React.useMemo(
       () => getStyleProperty(pointSize, props.clusterFontFamily),
-      [props.clusterFontFamily, pointSize]
+      [props.clusterFontFamily, pointSize],
     )
 
     return (

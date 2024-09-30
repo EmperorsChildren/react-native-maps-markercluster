@@ -17,13 +17,13 @@ export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
     const { region, mapRef } = useMapView()
 
     const [clusters, setClusters] = React.useState<MarkerClusterType.Cluster[]>(
-      []
+      [],
     )
     const superClusterRef = React.useRef<Supercluster | undefined>(undefined)
 
     const childrenProp = React.useMemo(
       () => React.Children.toArray(props.children),
-      [props.children]
+      [props.children],
     )
 
     React.useEffect(() => {
@@ -54,7 +54,7 @@ export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
     const handleOnClusterPress = (cluster: MarkerClusterType.Cluster) => () => {
       const children = superClusterRef.current?.getLeaves(
         Number(cluster.id),
-        Infinity
+        Infinity,
       )
 
       if (props.preserveClusterPressBehavior) {
