@@ -52,6 +52,7 @@ export const MapView: React.FC<Props> = (props) => {
   )
 
   return (
+    //@ts-ignore
     <MapViewContext.Provider value={{ region: currentRegion, mapRef }}>
       <RNMapView
         {...rest}

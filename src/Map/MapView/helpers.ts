@@ -15,6 +15,7 @@ export const isMarker = (
   component.props.coordinate &&
   component.props.cluster !== false
 
+//@ts-ignore
 export const calculateBBox = (region: Region): GeoViewport.BoundingBox => {
   let lngD: number
   if (region.longitudeDelta < 0) lngD = region.longitudeDelta + 360
@@ -30,6 +31,7 @@ export const calculateBBox = (region: Region): GeoViewport.BoundingBox => {
 
 export const returnMapZoom = (
   region: Region,
+  //@ts-ignore
   bBox: GeoViewport.BoundingBox,
   minZoom: number,
 ) => {
