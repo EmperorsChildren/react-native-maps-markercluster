@@ -1,6 +1,6 @@
 {
   "name": "@emperorschildren/react-native-maps-markercluster",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "React Native Map Clustering both for Android and iOS",
   "repository": {
     "type": "git",
