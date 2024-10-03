@@ -1,9 +1,9 @@
 import React, { useCallback, useContext } from 'react'
 import RNMapView, {
+  AnimatedRegion,
   Details,
   MapViewProps,
   Region,
-  AnimatedRegion,
 } from 'react-native-maps'
 
 export type MapViewRef = RNMapView

@@ -23,30 +23,35 @@ if (
 export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
   React.memo(
     ({
-      animationEnabled = true,
-      children,
-      clusterBackgroundColor,
-      clusterFontFamily,
-      clusterTextColor,
-      clusterWrapperBackgroundColor,
+      children: childrenFromProp,
       clusteringEnabled = true,
-      edgePadding = { top: 50, left: 50, right: 50, bottom: 50 },
-      extent = 512,
-      layoutAnimationConf = LayoutAnimation.Presets.spring,
-      maxZoom = 16,
-      minPoints = 2,
-      minZoom = 0,
-      nodeSize = 64,
-      onMarkersChange = () => {},
-      onPressCluster = () => {},
+      animationEnabled = true,
       preserveClusterPressBehavior = false,
-      radius = Dimensions.get('window').width * 0.06,
-      renderCluster: renderClusterProp,
-      selectedClusterColor,
-      selectedClusterId,
-      spiderLineColor = '#FF0000',
-      spiralEnabled = true,
+      layoutAnimationConf = LayoutAnimation.Presets.spring,
       tracksViewChanges = false,
+      // SuperCluster parameters
+      radius = Dimensions.get('window').width * 0.06,
+      maxZoom = 16,
+      minZoom = 0,
+      minPoints = 2,
+      extent = 512,
+      nodeSize = 64,
+      // Map parameters
+      edgePadding = { top: 50, left: 50, right: 50, bottom: 50 },
+      // Cluster styles
+      // spiralEnabled = true,
+      // spiderLineColor = '#FF0000',
+      // Callbacks
+      onPressCluster = () => {},
+      onMarkersChange = () => {},
+      // custom cluster renderer
+      renderCluster: renderClusterFromProp,
+      clusterWrapperBackgroundColor,
+      clusterTextColor,
+      clusterFontFamily,
+      selectedClusterId,
+      selectedClusterColor,
+      clusterBackgroundColor,
     }) => {
       const { region, mapRef } = useMapView()
 
@@ -56,16 +61,18 @@ export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
       const superClusterRef = React.useRef<Supercluster | undefined>(undefined)
 
       const childrenProp = React.useMemo(
-        () => React.Children.toArray(children),
-        [children],
+        () => React.Children.toArray(childrenFromProp),
+        [childrenFromProp],
       )
 
       React.useEffect(() => {
         initSuperCluster()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [childrenProp, clusteringEnabled])
 
       React.useEffect(() => {
         onRegionChangeComplete()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [region])
 
       const onRegionChangeComplete = () => {
@@ -143,8 +150,8 @@ export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
           return childrenProp[cluster.properties.index]
         }
 
-        if (renderClusterProp) {
-          renderClusterProp({
+        if (renderClusterFromProp) {
+          renderClusterFromProp({
             onPress: handleOnClusterPress(cluster),
             geometry: cluster.geometry,
             properties: cluster.properties,
