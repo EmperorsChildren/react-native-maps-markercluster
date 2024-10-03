@@ -27,6 +27,7 @@
     "lib"
   ],
   "scripts": {
+    "bundle": "yarn lint && yarn compile && npm publish --access public",
     "compile": "rm -rf lib && tsc -p .",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "prepare": "yarn compile",
