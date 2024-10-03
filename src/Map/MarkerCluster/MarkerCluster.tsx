@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dimensions, LayoutAnimation } from 'react-native'
+import { Dimensions, LayoutAnimation, Platform } from 'react-native'
 import Supercluster from 'supercluster'
 
 import { useMapView } from '../MapView'
@@ -18,6 +18,11 @@ export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
       children: childrenFromProp,
       clusteringEnabled = true,
       animationEnabled = false,
+      clusterExplosionAnimation = () => {
+        if (Platform.OS === 'ios') {
+          LayoutAnimation.configureNext(layoutAnimationConf!)
+        }
+      },
       preserveClusterPressBehavior = false,
       layoutAnimationConf = LayoutAnimation.Presets.spring,
       tracksViewChanges = false,
@@ -74,8 +79,8 @@ export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
         const zoom = returnMapZoom(region, bBox, minZoom!)
         const newClusters = superClusterRef.current.getClusters(bBox, zoom)
 
-        if (animationEnabled) {
-          LayoutAnimation.configureNext(layoutAnimationConf!)
+        if (animationEnabled && clusterExplosionAnimation) {
+          clusterExplosionAnimation()
         }
 
         setClusters(newClusters)

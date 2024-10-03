@@ -23,6 +23,7 @@ export namespace MarkerClusterType {
     readonly clusteringEnabled?: boolean
     readonly spiralEnabled?: boolean
     readonly animationEnabled?: boolean
+    readonly clusterExplosionAnimation?: () => void
     readonly preserveClusterPressBehavior?: boolean
     readonly tracksViewChanges?: boolean
     readonly layoutAnimationConf?: LayoutAnimationConfig
