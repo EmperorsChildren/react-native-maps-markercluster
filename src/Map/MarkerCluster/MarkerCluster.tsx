@@ -21,160 +21,163 @@ if (
 }
 
 export const MarkerCluster: React.FC<MarkerClusterType.WrapperProps> =
-  React.memo((props) => {
-    const { region, mapRef } = useMapView()
+  React.memo(
+    ({
+      animationEnabled = true,
+      children,
+      clusterBackgroundColor,
+      clusterFontFamily,
+      clusterTextColor,
+      clusterWrapperBackgroundColor,
+      clusteringEnabled = true,
+      edgePadding = { top: 50, left: 50, right: 50, bottom: 50 },
+      extent = 512,
+      layoutAnimationConf = LayoutAnimation.Presets.spring,
+      maxZoom = 16,
+      minPoints = 2,
+      minZoom = 0,
+      nodeSize = 64,
+      onMarkersChange = () => {},
+      onPressCluster = () => {},
+      preserveClusterPressBehavior = false,
+      radius = Dimensions.get('window').width * 0.06,
+      renderCluster: renderClusterProp,
+      selectedClusterColor,
+      selectedClusterId,
+      spiderLineColor = '#FF0000',
+      spiralEnabled = true,
+      tracksViewChanges = false,
+    }) => {
+      const { region, mapRef } = useMapView()
 
-    const [clusters, setClusters] = React.useState<MarkerClusterType.Cluster[]>(
-      [],
-    )
-    const superClusterRef = React.useRef<Supercluster | undefined>(undefined)
+      const [clusters, setClusters] = React.useState<
+        MarkerClusterType.Cluster[]
+      >([])
+      const superClusterRef = React.useRef<Supercluster | undefined>(undefined)
 
-    const childrenProp = React.useMemo(
-      () => React.Children.toArray(props.children),
-      [props.children],
-    )
-
-    React.useEffect(() => {
-      initSuperCluster()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [childrenProp, props.clusteringEnabled])
-
-    React.useEffect(() => {
-      onRegionChangeComplete()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [region])
-
-    const onRegionChangeComplete = () => {
-      if (!superClusterRef.current || !region) return
-
-      const bBox = calculateBBox(region)
-      const zoom = returnMapZoom(region, bBox, props.minZoom!)
-      const newClusters = superClusterRef.current.getClusters(bBox, zoom)
-
-      if (props.animationEnabled) {
-        LayoutAnimation.configureNext(props.layoutAnimationConf!)
-      }
-
-      setClusters(newClusters)
-      props.onMarkersChange?.(newClusters)
-    }
-
-    const handleOnClusterPress = (cluster: MarkerClusterType.Cluster) => () => {
-      const children = superClusterRef.current?.getLeaves(
-        Number(cluster.id),
-        Infinity,
+      const childrenProp = React.useMemo(
+        () => React.Children.toArray(children),
+        [children],
       )
 
-      if (props.preserveClusterPressBehavior) {
-        props.onPressCluster?.(cluster, children)
-        return
+      React.useEffect(() => {
+        initSuperCluster()
+      }, [childrenProp, clusteringEnabled])
+
+      React.useEffect(() => {
+        onRegionChangeComplete()
+      }, [region])
+
+      const onRegionChangeComplete = () => {
+        if (!superClusterRef.current || !region) return
+
+        const bBox = calculateBBox(region)
+        const zoom = returnMapZoom(region, bBox, minZoom!)
+        const newClusters = superClusterRef.current.getClusters(bBox, zoom)
+
+        if (animationEnabled) {
+          LayoutAnimation.configureNext(layoutAnimationConf!)
+        }
+
+        setClusters(newClusters)
+        onMarkersChange?.(newClusters)
       }
 
-      const coordinates = children?.map(({ geometry }) => ({
-        latitude: geometry.coordinates[1],
-        longitude: geometry.coordinates[0],
-      }))
+      const handleOnClusterPress =
+        (cluster: MarkerClusterType.Cluster) => () => {
+          const children = superClusterRef.current?.getLeaves(
+            Number(cluster.id),
+            Infinity,
+          )
 
-      mapRef?.current?.fitToCoordinates(coordinates, {
-        edgePadding: props.edgePadding,
-      })
-
-      props.onPressCluster?.(cluster, children)
-    }
-
-    const initSuperCluster = () => {
-      if (!props.clusteringEnabled) {
-        setClusters([])
-        superClusterRef.current = undefined
-        return
-      }
-
-      const rawData: MarkerClusterType.GeoJSONFeature[] = []
-
-      childrenProp.forEach((child, index) => {
-        isMarker(child) && rawData.push(markerToGeoJSONFeature(child, index))
-      })
-
-      superClusterRef.current = new Supercluster({
-        radius: props.radius,
-        maxZoom: props.maxZoom,
-        minZoom: props.minZoom,
-        minPoints: props.minPoints,
-        extent: props.extent,
-        nodeSize: props.nodeSize,
-      })
-
-      superClusterRef.current.load(rawData)
-
-      const bBox = calculateBBox(region!)
-      const zoom = returnMapZoom(region!, bBox, props.minZoom!)
-      const newClusters = superClusterRef.current.getClusters(bBox, zoom)
-
-      setClusters(newClusters)
-    }
-
-    const renderCluster = (cluster: MarkerClusterType.Cluster) => {
-      if (cluster.properties.point_count === 0) {
-        return childrenProp[cluster.properties.index]
-      }
-
-      if (props.renderCluster) {
-        props.renderCluster({
-          onPress: handleOnClusterPress(cluster),
-          geometry: cluster.geometry,
-          properties: cluster.properties,
-          tracksViewChanges: props.tracksViewChanges,
-          clusterWrapperBackgroundColor: props.clusterWrapperBackgroundColor,
-          clusterTextColor: props.clusterTextColor,
-          clusterFontFamily: props.clusterFontFamily,
-          clusterBackgroundColor:
-            props.selectedClusterId === cluster.id
-              ? props.selectedClusterColor
-              : props.clusterBackgroundColor,
-        })
-      }
-
-      return (
-        <MarkerClusterItem
-          key={`cluster-${cluster.id}`}
-          onPress={handleOnClusterPress(cluster)}
-          geometry={cluster.geometry}
-          properties={cluster.properties}
-          tracksViewChanges={props.tracksViewChanges}
-          clusterWrapperBackgroundColor={props.clusterWrapperBackgroundColor}
-          clusterTextColor={props.clusterTextColor}
-          clusterFontFamily={props.clusterFontFamily}
-          clusterBackgroundColor={
-            props.selectedClusterId === cluster.id
-              ? props.selectedClusterColor
-              : props.clusterBackgroundColor
+          if (preserveClusterPressBehavior) {
+            onPressCluster?.(cluster, children)
+            return
           }
-        />
-      )
-    }
 
-    return <>{clusters.map((m) => renderCluster(m))}</>
-  })
+          const coordinates = children?.map(({ geometry }) => ({
+            latitude: geometry.coordinates[1],
+            longitude: geometry.coordinates[0],
+          }))
 
-MarkerCluster.defaultProps = {
-  clusteringEnabled: true,
-  spiralEnabled: true,
-  animationEnabled: true,
-  preserveClusterPressBehavior: false,
-  layoutAnimationConf: LayoutAnimation.Presets.spring,
-  tracksViewChanges: false,
-  // SuperCluster parameters
-  radius: Dimensions.get('window').width * 0.06,
-  maxZoom: 16,
-  minZoom: 0,
-  minPoints: 2,
-  extent: 512,
-  nodeSize: 64,
-  // Map parameters
-  edgePadding: { top: 50, left: 50, right: 50, bottom: 50 },
-  // Cluster styles
-  spiderLineColor: '#FF0000',
-  // Callbacks
-  onPressCluster: () => {},
-  onMarkersChange: () => {},
-}
+          mapRef?.current?.fitToCoordinates(coordinates, {
+            edgePadding: edgePadding,
+          })
+
+          onPressCluster?.(cluster, children)
+        }
+
+      const initSuperCluster = () => {
+        if (!clusteringEnabled) {
+          setClusters([])
+          superClusterRef.current = undefined
+          return
+        }
+
+        const rawData: MarkerClusterType.GeoJSONFeature[] = []
+
+        childrenProp.forEach((child, index) => {
+          isMarker(child) && rawData.push(markerToGeoJSONFeature(child, index))
+        })
+
+        superClusterRef.current = new Supercluster({
+          radius: radius,
+          maxZoom: maxZoom,
+          minZoom: minZoom,
+          minPoints: minPoints,
+          extent: extent,
+          nodeSize: nodeSize,
+        })
+
+        superClusterRef.current.load(rawData)
+
+        const bBox = calculateBBox(region!)
+        const zoom = returnMapZoom(region!, bBox, minZoom!)
+        const newClusters = superClusterRef.current.getClusters(bBox, zoom)
+
+        setClusters(newClusters)
+      }
+
+      const renderCluster = (cluster: MarkerClusterType.Cluster) => {
+        if (cluster.properties.point_count === 0) {
+          return childrenProp[cluster.properties.index]
+        }
+
+        if (renderClusterProp) {
+          renderClusterProp({
+            onPress: handleOnClusterPress(cluster),
+            geometry: cluster.geometry,
+            properties: cluster.properties,
+            tracksViewChanges: tracksViewChanges,
+            clusterWrapperBackgroundColor: clusterWrapperBackgroundColor,
+            clusterTextColor: clusterTextColor,
+            clusterFontFamily: clusterFontFamily,
+            clusterBackgroundColor:
+              selectedClusterId === cluster.id
+                ? selectedClusterColor
+                : clusterBackgroundColor,
+          })
+        }
+
+        return (
+          <MarkerClusterItem
+            key={`cluster-${cluster.id}`}
+            onPress={handleOnClusterPress(cluster)}
+            geometry={cluster.geometry}
+            properties={cluster.properties}
+            tracksViewChanges={tracksViewChanges}
+            clusterWrapperBackgroundColor={clusterWrapperBackgroundColor}
+            clusterTextColor={clusterTextColor}
+            clusterFontFamily={clusterFontFamily}
+            clusterBackgroundColor={
+              selectedClusterId === cluster.id
+                ? selectedClusterColor
+                : clusterBackgroundColor
+            }
+          />
+        )
+      }
+
+      return <>{clusters.map((m) => renderCluster(m))}</>
+    },
+  )
