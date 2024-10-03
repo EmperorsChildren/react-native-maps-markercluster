@@ -1,7 +1,7 @@
 import GeoViewport from '@placemarkio/geo-viewport'
 import type { Component } from 'react'
 import { Dimensions } from 'react-native'
-import type { MapMarkerProps, Region } from 'react-native-maps'
+import type { AnimatedRegion, MapMarkerProps, Region } from 'react-native-maps'
 
 import type { MarkerClusterType } from '../types'
 
@@ -15,8 +15,9 @@ export const isMarker = (
   component.props.coordinate &&
   component.props.cluster !== false
 
-//@ts-ignore
-export const calculateBBox = (region: Region): GeoViewport.BoundingBox => {
+export const calculateBBox = (
+  region: Region | AnimatedRegion,
+): GeoViewport.Bounds => {
   let lngD: number
   if (region.longitudeDelta < 0) lngD = region.longitudeDelta + 360
   else lngD = region.longitudeDelta
@@ -30,9 +31,8 @@ export const calculateBBox = (region: Region): GeoViewport.BoundingBox => {
 }
 
 export const returnMapZoom = (
-  region: Region,
-  //@ts-ignore
-  bBox: GeoViewport.BoundingBox,
+  region: Region | AnimatedRegion,
+  bBox: GeoViewport.Bounds,
   minZoom: number,
 ) => {
   const viewport =

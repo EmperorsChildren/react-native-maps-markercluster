@@ -1,10 +1,15 @@
 import React, { useCallback, useContext } from 'react'
-import RNMapView, { Details, MapViewProps, Region } from 'react-native-maps'
+import RNMapView, {
+  Details,
+  MapViewProps,
+  Region,
+  AnimatedRegion,
+} from 'react-native-maps'
 
 export type MapViewRef = RNMapView
 
 type Context = {
-  readonly region?: Region
+  readonly region?: Region | AnimatedRegion
   readonly mapRef?: React.MutableRefObject<MapViewRef | undefined>
 }
 
@@ -52,7 +57,6 @@ export const MapView: React.FC<Props> = (props) => {
   )
 
   return (
-    //@ts-ignore
     <MapViewContext.Provider value={{ region: currentRegion, mapRef }}>
       <RNMapView
         {...rest}
